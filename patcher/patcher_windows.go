@@ -9,12 +9,14 @@ import (
 )
 
 func Run() error {
-	dir, err := getDir()
+	/*dir, err := getDir()
 	if err != nil {
 		return err
-	}
+		}*/
 
-	err = os.Chdir(dir)
+	dir := "."
+
+	err := os.Chdir(dir)
 	if err != nil {
 		return err
 	}
@@ -37,10 +39,14 @@ func Run() error {
 			return err
 		}
 
+		SetWritable(path)
+
 		err = cfg.SaveTo(path)
 		if err != nil {
 			return err
 		}
+
+		SetReadOnly(path)
 	}
 
 	return nil

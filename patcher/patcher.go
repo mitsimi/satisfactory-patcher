@@ -29,3 +29,13 @@ func createFile(path string) error {
 	f.Close()
 	return nil
 }
+
+func SetWritable(filepath string) error {
+	err := os.Chmod(filepath, 0222)
+	return err
+}
+
+func SetReadOnly(filepath string) error {
+	err := os.Chmod(filepath, 0444)
+	return err
+}
