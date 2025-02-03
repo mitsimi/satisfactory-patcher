@@ -11,4 +11,6 @@ import (
 func Run() error {
 	fmt.Printf("%s is not supported", runtime.GOOS)
 	os.Exit(1)
+
+	return nil
 }
