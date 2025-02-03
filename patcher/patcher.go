@@ -5,12 +5,6 @@ import (
 	"path/filepath"
 )
 
-var config = map[string]func() interface{}{
-	EngineIni:      PatchedEngine,
-	GameIni:        PatchedGame,
-	ScalabilityIni: PatchedScalability,
-}
-
 func getDir() (string, error) {
 	localAppData, err := os.UserCacheDir()
 	if err != nil {
@@ -26,7 +20,12 @@ func getDir() (string, error) {
 	return dir, nil
 }
 
-func createFile(path string) {
-	f, _ := os.Create(path)
+func createFile(path string) error {
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+
 	f.Close()
+	return nil
 }

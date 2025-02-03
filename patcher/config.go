@@ -1,44 +1,56 @@
 package patcher
 
-type Engine struct {
-	Player        EnginePlayer        `ini:"/Script/Engine.Player"`
-	IpNetDriver   EngineIpNetDriver   `ini:"/Script/OnlineSubsystemUtils.IpNetDriver"`
-	EpicNetDriver EngineEpicNetDriver `ini:"/Script/SocketSubsystemEpic.EpicNetDriver"`
+import (
+	"errors"
+
+	"gopkg.in/ini.v1"
+)
+
+type Config struct {
+	Engine      EngineConfig
+	Game        GameConfig
+	Scalability ScalabilityConfig
 }
 
-type EnginePlayer struct {
+type Player struct {
 	ConfiguredInternetSpeed int
 	ConfiguredLanSpeed      int
 }
 
-type EngineIpNetDriver struct {
+type IpNetDriver struct {
 	MaxClientRate         int
 	MaxInternetClientRate int
 }
 
-type EngineEpicNetDriver struct {
+type EpicNetDriver struct {
 	MaxClientRate         int
 	MaxInternetClientRate int
 }
 
-type Game struct {
-	GameNetworkManager NetworkManager `ini:"/Script/Engine.GameNetworkManager"`
+type EngineConfig struct {
+	Player        Player        `ini:"/Script/Engine.Player"`
+	IpNetDriver   IpNetDriver   `ini:"/Script/OnlineSubsystemUtils.IpNetDriver"`
+	EpicNetDriver EpicNetDriver `ini:"/Script/SocketSubsystemEpic.EpicNetDriver"`
 }
 
-type NetworkManager struct {
+type GameNetworkManager struct {
 	TotalNetBandwidth   int
 	MaxDynamicBandwidth int
 	MinDynamicBandwidth int
 }
 
-type Scalability struct {
-	NetworkQuality ScalabilityNetworkQuality `ini:"NetworkQuality@3"`
+type GameConfig struct {
+	GameNetworkManager GameNetworkManager `ini:"/Script/Engine.GameNetworkManager"`
 }
 
-type ScalabilityNetworkQuality struct {
+type NetworkQuality struct {
 	TotalNetBandwidth   int
 	MaxDynamicBandwidth int
 	MinDynamicBandwidth int
+}
+
+type ScalabilityConfig struct {
+	NetworkQuality NetworkQuality `ini:"NetworkQuality@3"`
 }
 
 const (
@@ -47,28 +59,52 @@ const (
 	ScalabilityIni = "Scalability.ini"
 )
 
-func PatchedEngine() interface{} {
+var INIs = []string{EngineIni, GameIni, ScalabilityIni}
+
+func applyPatch(cfg *ini.File, path string) error {
+	var err error = nil
+	switch path {
+	case EngineIni:
+		data := patchedEngine()
+		err = cfg.ReflectFrom(data)
+		break
+	case GameIni:
+		data := patchedGame()
+		err = cfg.ReflectFrom(data)
+		break
+	case ScalabilityIni:
+		data := patchedScalability()
+		err = cfg.ReflectFrom(data)
+		break
+	default:
+		return errors.New("could not apply a patch for unknown file")
+	}
+
+	return err
+}
+
+func patchedEngine() *EngineConfig {
 	v := 104857600
-	return Engine{
-		Player: EnginePlayer{
+	return &EngineConfig{
+		Player: Player{
 			ConfiguredInternetSpeed: v,
 			ConfiguredLanSpeed:      v,
 		},
-		IpNetDriver: EngineIpNetDriver{
+		IpNetDriver: IpNetDriver{
 			MaxClientRate:         v,
 			MaxInternetClientRate: v,
 		},
-		EpicNetDriver: EngineEpicNetDriver{
+		EpicNetDriver: EpicNetDriver{
 			MaxClientRate:         v,
 			MaxInternetClientRate: v,
 		},
 	}
 }
 
-func PatchedGame() interface{} {
+func patchedGame() *GameConfig {
 	v := 104857600
-	return Game{
-		GameNetworkManager: NetworkManager{
+	return &GameConfig{
+		GameNetworkManager: GameNetworkManager{
 			TotalNetBandwidth:   v,
 			MaxDynamicBandwidth: v,
 			MinDynamicBandwidth: v,
@@ -76,10 +112,10 @@ func PatchedGame() interface{} {
 	}
 }
 
-func PatchedScalability() interface{} {
+func patchedScalability() *ScalabilityConfig {
 	v := 104857600
-	return Scalability{
-		NetworkQuality: ScalabilityNetworkQuality{
+	return &ScalabilityConfig{
+		NetworkQuality: NetworkQuality{
 			TotalNetBandwidth:   v,
 			MaxDynamicBandwidth: v,
 			MinDynamicBandwidth: v,
