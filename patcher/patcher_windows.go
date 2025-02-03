@@ -5,7 +5,6 @@ package patcher
 import (
 	"gopkg.in/ini.v1"
 	"os"
-	"path/filepath"
 )
 
 func Run() error {
@@ -16,9 +15,39 @@ func Run() error {
 
 	dir = "."
 
-	for file, cfg := range config {
+	err = os.Chdir(dir)
+	if err != nil {
+		return err
+	}
 
+	f, err := ini.LoadSources(ini.LoadOptions{SkipUnrecognizableLines: true}, EngineIni)
+	if err != nil {
+		return err
+	}
+	v := 104857600
+	err = f.Append(Engine{
+		Player: EnginePlayer{
+			ConfiguredInternetSpeed: v,
+			ConfiguredLanSpeed:      v,
+		},
+		IpNetDriver: EngineIpNetDriver{
+			MaxClientRate:         v,
+			MaxInternetClientRate: v,
+		},
+		EpicNetDriver: EngineEpicNetDriver{
+			MaxClientRate:         v,
+			MaxInternetClientRate: v,
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	err = f.SaveTo(EngineIni)
+
+	/*for file, cfg := range config {
 		fullPath := filepath.Join(dir, file)
+
 		if _, err := os.Stat(fullPath); os.IsNotExist(err) {
 			createFile(fullPath)
 		}
@@ -32,7 +61,9 @@ func Run() error {
 		if err != nil {
 			return err
 		}
-	}
+
+		err = f.SaveTo(fullPath)
+	}*/
 
 	return nil
 }

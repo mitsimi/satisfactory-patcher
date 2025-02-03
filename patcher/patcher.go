@@ -5,10 +5,10 @@ import (
 	"path/filepath"
 )
 
-var config = map[string]interface{}{
-	EngineIni:      PatchedEngine(),
-	GameIni:        PatchedGame(),
-	ScalabilityIni: PatchedScalability(),
+var config = map[string]func() interface{}{
+	EngineIni:      PatchedEngine,
+	GameIni:        PatchedGame,
+	ScalabilityIni: PatchedScalability,
 }
 
 func getDir() (string, error) {

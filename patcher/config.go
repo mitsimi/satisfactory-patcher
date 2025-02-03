@@ -47,7 +47,7 @@ const (
 	ScalabilityIni = "Scalability.ini"
 )
 
-func PatchedEngine() Engine {
+func PatchedEngine() interface{} {
 	v := 104857600
 	return Engine{
 		Player: EnginePlayer{
@@ -65,7 +65,7 @@ func PatchedEngine() Engine {
 	}
 }
 
-func PatchedGame() Game {
+func PatchedGame() interface{} {
 	v := 104857600
 	return Game{
 		GameNetworkManager: NetworkManager{
@@ -76,7 +76,7 @@ func PatchedGame() Game {
 	}
 }
 
-func PatchedScalability() Scalability {
+func PatchedScalability() interface{} {
 	v := 104857600
 	return Scalability{
 		NetworkQuality: ScalabilityNetworkQuality{
