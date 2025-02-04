@@ -9,14 +9,12 @@ import (
 )
 
 func Run() error {
-	/*dir, err := getDir()
+	dir, err := getDir()
 	if err != nil {
 		return err
-		}*/
+	}
 
-	dir := "."
-
-	err := os.Chdir(dir)
+	err = os.Chdir(dir)
 	if err != nil {
 		return err
 	}
